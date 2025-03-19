@@ -4,24 +4,31 @@ const Thread = std.Thread;
 const Futex = Thread.Futex;
 const assert = std.debug.assert;
 
-locked: atomic.Value(u32) = atomic.Value(u32).init(0),
+const unlocked: u32 = 0;
+const locked: u32 = 1;
+const contended: u32 = 2;
+
+state: std.atomic.Value(u32) = std.atomic.Value(u32).init(unlocked),
 
 pub fn lock(self: *@This()) void {
-    while (!self.tryLock()) {
-        Futex.wait(&self.locked, 1);
+    if (!self.tryLock()) {
+        if (self.state.load(.seq_cst) == contended)
+            Futex.wait(&self.state, contended);
+
+        while (self.state.swap(contended, .seq_cst) != unlocked)
+            Futex.wait(&self.state, contended);
     }
 }
 
 pub fn tryLock(self: *@This()) bool {
-    return self.locked.swap(1, .seq_cst) == 0;
+    return self.state.cmpxchgWeak(unlocked, locked, .seq_cst, .seq_cst) == null;
 }
 
 pub fn unlock(self: *@This()) void {
-    assert(self.locked.load(.seq_cst) == 1);
-    assert(!self.tryLock());
+    const state = self.state.swap(unlocked, .seq_cst);
+    assert(state != unlocked);
 
-    self.locked.store(0, .seq_cst);
-    Futex.wake(&self.locked, 1);
+    if (state == contended) Futex.wake(&self.state, 1);
 }
 
 const testing = std.testing;
