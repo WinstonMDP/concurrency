@@ -5,7 +5,7 @@ const assert = std.debug.assert;
 locked: atomic.Value(bool) = atomic.Value(bool).init(false),
 
 pub fn lock(self: *@This()) void {
-    while (!self.tryLock()) {}
+    while (!self.tryLock()) while (self.locked.load(.seq_cst)) {};
 }
 
 pub fn tryLock(self: *@This()) bool {
