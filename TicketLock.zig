@@ -11,9 +11,12 @@ pub fn lock(self: *@This()) void {
 }
 
 pub fn tryLock(self: *@This()) bool {
+    const current_owner_ticket = self.owner_ticket.load(.seq_cst);
+    assert(current_owner_ticket <= self.next_free_ticket.load(.seq_cst));
+
     return self.next_free_ticket.cmpxchgWeak(
-        self.owner_ticket.load(.seq_cst),
-        self.owner_ticket.load(.seq_cst) + 1,
+        current_owner_ticket,
+        current_owner_ticket + 1,
         .seq_cst,
         .seq_cst,
     ) == null;
