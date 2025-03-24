@@ -1,10 +1,3 @@
-const std = @import("std");
-const Thread = std.Thread;
-const atomic = std.atomic;
-const ArrayList = std.ArrayList;
-const Mutex = @import("Mutex.zig");
-const Condition = @import("Condition.zig");
-
 pub fn ThreadPool(nthreads: comptime_int) type {
     return struct {
         mutex: Mutex = Mutex{},
@@ -51,8 +44,6 @@ pub fn ThreadPool(nthreads: comptime_int) type {
     };
 }
 
-const test_allocator = std.testing.allocator;
-
 test {
     const TestCtx = struct {
         fn func() void {
@@ -67,3 +58,11 @@ test {
     try thread_pool.submit(TestCtx.func);
     thread_pool.stop();
 }
+
+const std = @import("std");
+const Thread = std.Thread;
+const atomic = std.atomic;
+const ArrayList = std.ArrayList;
+const Mutex = @import("Mutex.zig");
+const Condition = @import("Condition.zig");
+const test_allocator = std.testing.allocator;

@@ -1,8 +1,3 @@
-const std = @import("std");
-const Mutex = @import("Mutex.zig");
-const Condition = @import("Condition.zig");
-const atomic = std.atomic;
-
 mutex: Mutex = Mutex{},
 condition: Condition = Condition{},
 count: atomic.Value(usize) = atomic.Value(usize).init(0),
@@ -29,3 +24,8 @@ test {
     wait_group.done();
     wait_group.wait();
 }
+
+const std = @import("std");
+const atomic = std.atomic;
+const Mutex = @import("Mutex.zig");
+const Condition = @import("Condition.zig");

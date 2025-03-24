@@ -1,7 +1,3 @@
-const std = @import("std");
-const atomic = std.atomic;
-const assert = std.debug.assert;
-
 locked: atomic.Value(bool) = atomic.Value(bool).init(false),
 
 pub fn lock(self: *@This()) void {
@@ -24,10 +20,6 @@ pub fn unlock(self: *@This()) void {
     self.locked.store(false, .seq_cst);
 }
 
-const testing = std.testing;
-const expect = testing.expect;
-const expectEqual = testing.expectEqual;
-
 test {
     var spin_lock = @This(){};
 
@@ -41,9 +33,6 @@ test {
 
     try expect(spin_lock.tryLock());
 }
-
-const SpinLock = @This();
-const Thread = std.Thread;
 
 test {
     const ntimes = 100_000;
@@ -68,3 +57,12 @@ test {
 
     try expectEqual(test_ctx.val, threads.len * ntimes);
 }
+
+const SpinLock = @This();
+const std = @import("std");
+const atomic = std.atomic;
+const assert = std.debug.assert;
+const testing = std.testing;
+const expect = testing.expect;
+const expectEqual = testing.expectEqual;
+const Thread = std.Thread;

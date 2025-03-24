@@ -1,6 +1,3 @@
-const std = @import("std");
-const Mutex = std.Thread.Mutex;
-
 fn Mutexed(T: type) type {
     return struct {
         val: T,
@@ -23,3 +20,6 @@ test {
     try std.testing.expectEqual(9, val.*);
     defer mutexed.mutex.unlock();
 }
+
+const std = @import("std");
+const Mutex = std.Thread.Mutex;

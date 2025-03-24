@@ -1,7 +1,3 @@
-const std = @import("std");
-const atomic = std.atomic;
-const assert = std.debug.assert;
-
 next_free_ticket: atomic.Value(u64) = atomic.Value(u64).init(0),
 owner_ticket: atomic.Value(u64) = atomic.Value(u64).init(0),
 
@@ -27,10 +23,6 @@ pub fn unlock(self: *@This()) void {
     _ = self.owner_ticket.fetchAdd(1, .seq_cst);
 }
 
-const testing = std.testing;
-const expect = testing.expect;
-const expectEqual = testing.expectEqual;
-
 test {
     var ticket_lock = @This(){};
 
@@ -44,9 +36,6 @@ test {
 
     try expect(ticket_lock.tryLock());
 }
-
-const TicketLock = @This();
-const Thread = std.Thread;
 
 test {
     const ntimes = 100_000;
@@ -73,3 +62,12 @@ test {
 
     try expectEqual(test_ctx.val, threads.len * ntimes);
 }
+
+const TicketLock = @This();
+const std = @import("std");
+const atomic = std.atomic;
+const assert = std.debug.assert;
+const Thread = std.Thread;
+const testing = std.testing;
+const expect = testing.expect;
+const expectEqual = testing.expectEqual;

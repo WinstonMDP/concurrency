@@ -1,10 +1,3 @@
-const std = @import("std");
-const builtin = @import("builtin");
-const Condition = @import("Condition.zig");
-const Mutex = @import("Mutex.zig");
-const mode = builtin.mode;
-const assert = std.debug.assert;
-
 mutex: Mutex = Mutex{},
 condition: Condition = Condition{},
 npermits: usize,
@@ -31,8 +24,6 @@ pub fn release(self: *@This()) void {
     self.mutex.unlock();
 }
 
-const expectEqual = std.testing.expectEqual;
-
 test {
     var semaphore = @This().init(3);
     semaphore.acquire();
@@ -42,3 +33,11 @@ test {
     else
         expectEqual(semaphore.max_permits, void{});
 }
+
+const std = @import("std");
+const assert = std.debug.assert;
+const expectEqual = std.testing.expectEqual;
+const builtin = @import("builtin");
+const mode = builtin.mode;
+const Condition = @import("Condition.zig");
+const Mutex = @import("Mutex.zig");

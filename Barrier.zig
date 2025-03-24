@@ -1,7 +1,3 @@
-const std = @import("std");
-const Mutex = @import("Mutex.zig");
-const Condition = @import("Condition.zig");
-
 mutex: Mutex = Mutex{},
 condition: Condition = Condition{},
 nthreads: usize,
@@ -22,9 +18,6 @@ pub fn arriveAndWait(self: *@This()) void {
     if (self.narrived == 0) self.go = false;
 }
 
-const Barrier = @This();
-const Thread = std.Thread;
-
 test {
     var threads: [12]Thread = undefined;
     const TestCtx = struct {
@@ -40,3 +33,9 @@ test {
         thread.* = try Thread.spawn(.{}, TestCtx.func, .{&test_ctx});
     inline for (&threads) |*thread| thread.join();
 }
+
+const Barrier = @This();
+const std = @import("std");
+const Thread = std.Thread;
+const Mutex = @import("Mutex.zig");
+const Condition = @import("Condition.zig");

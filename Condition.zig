@@ -1,10 +1,3 @@
-const std = @import("std");
-const Mutex = @import("Mutex.zig");
-const assert = std.debug.assert;
-const atomic = std.atomic;
-const Thread = std.Thread;
-const Futex = Thread.Futex;
-
 futex_queue: atomic.Value(u32) = atomic.Value(u32).init(0),
 
 pub fn wait(self: *@This(), mutex: *Mutex) void {
@@ -25,8 +18,6 @@ pub fn broadcast(self: *@This()) void {
     _ = self.futex_queue.fetchAdd(1, .seq_cst);
     Futex.wake(&self.futex_queue, std.math.maxInt(u32));
 }
-
-const Condition = @This();
 
 test {
     const TestCtx = struct {
@@ -58,9 +49,6 @@ test {
     test_ctx.consumer();
     thread.join();
 }
-
-const expectEqual = std.testing.expectEqual;
-const ArrayList = std.ArrayList;
 
 test {
     const ntimes = 100_000;
@@ -98,3 +86,13 @@ test {
         thread.* = try Thread.spawn(.{}, TestCtx.func, .{&test_ctx});
     inline for (&threads) |*thread| thread.join();
 }
+
+const Condition = @This();
+const std = @import("std");
+const assert = std.debug.assert;
+const atomic = std.atomic;
+const Thread = std.Thread;
+const Futex = Thread.Futex;
+const expectEqual = std.testing.expectEqual;
+const ArrayList = std.ArrayList;
+const Mutex = @import("Mutex.zig");

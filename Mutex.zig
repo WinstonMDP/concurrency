@@ -1,9 +1,3 @@
-const std = @import("std");
-const atomic = std.atomic;
-const Thread = std.Thread;
-const Futex = Thread.Futex;
-const assert = std.debug.assert;
-
 const unlocked: u32 = 0;
 const locked: u32 = 1;
 const contended: u32 = 2;
@@ -31,10 +25,6 @@ pub fn unlock(self: *@This()) void {
     if (state == contended) Futex.wake(&self.state, 1);
 }
 
-const testing = std.testing;
-const expect = testing.expect;
-const expectEqual = testing.expectEqual;
-
 test {
     var mutex = @This(){};
 
@@ -48,8 +38,6 @@ test {
 
     try expect(mutex.tryLock());
 }
-
-const Mutex = @This();
 
 test {
     const ntimes = 1_000_000;
@@ -76,3 +64,13 @@ test {
 
     try expectEqual(test_ctx.val, threads.len * ntimes);
 }
+
+const Mutex = @This();
+const std = @import("std");
+const atomic = std.atomic;
+const Thread = std.Thread;
+const Futex = Thread.Futex;
+const assert = std.debug.assert;
+const testing = std.testing;
+const expect = testing.expect;
+const expectEqual = testing.expectEqual;
